@@ -24,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
         studentGrade = findViewById(R.id.studentGrade);
         studentName = findViewById(R.id.studentName);
 
+
         database = openOrCreateDatabase("university", Context.MODE_PRIVATE,null);
 
         database.execSQL("CREATE TABLE IF NOT EXISTS" +
@@ -39,24 +40,34 @@ public class MainActivity extends AppCompatActivity {
                 "'"+Double.parseDouble(studentGrade.getEditableText().toString())+"')");
         Toast.makeText(this,"NEW DATA SUCCESSFULLY SAVE", Toast.LENGTH_LONG).show();
     }
-    public void updateData(View view){
+    public void updateData(View view) {
         database.execSQL("UPDATE student_table " +
-                "SET student_name = '"+studentName.getEditableText().toString()+"'," +
-                " student_grade ='"+Double.parseDouble(studentGrade.getEditableText().toString())+"'," +
-                " WHERE student_id ='"+STUDENT_ID.getEditableText().toString()+"'");
-        Toast.makeText(this,"UPDATE DATA SUCCESSFULLY", Toast.LENGTH_LONG).show();
+                "SET student_name = '" + studentName.getEditableText().toString() + "'," +
+                " student_grade = '" + Double.parseDouble(studentGrade.getEditableText().toString()) + "'" +
+                " WHERE student_id = '" + STUDENT_ID.getEditableText().toString() + "'");
+
+        Toast.makeText(this, "UPDATE DATA SUCCESSFULLY", Toast.LENGTH_LONG).show();
     }
+
     public void deleteData(View view) {
         String studentId = STUDENT_ID.getEditableText().toString();
 
         int rowsDeleted = database.delete("student_table", "student_id = ?", new String[]{studentId});
         if (rowsDeleted > 0) {
+            STUDENT_ID.setText("");
+            studentName.setText("");
+            studentGrade.setText("");
             Toast.makeText(this, "Data deleted successfully", Toast.LENGTH_LONG).show();
         } else {
             Toast.makeText(this, "Failed to delete data", Toast.LENGTH_LONG).show();
         }
     }
 
+    public void returnData(String id,String name,String grade){
+        STUDENT_ID.setText(id);
+        studentName.setText(name);
+        studentGrade.setText(grade);
+    }
     public void viewAllData(View view) {
         Cursor cursor = database.rawQuery("SELECT * FROM student_table", null);
 
@@ -103,6 +114,9 @@ public class MainActivity extends AppCompatActivity {
                 data.append("Student ID: ").append(studentId).append("\n");
                 data.append("Student Name: ").append(studentName).append("\n");
                 data.append("Student Grade: ").append(studentGrade).append("\n\n");
+
+                returnData(studentId,studentName,String.valueOf(studentGrade));
+
             } while (cursor.moveToNext());
         }
 
